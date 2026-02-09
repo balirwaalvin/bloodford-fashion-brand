@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<div class="about-hero">
+    <div class="container">
+        <h1>Our Story</h1>
+        <p>The passion behind BloodFord Fashion Brand — original fashion, crafted with purpose</p>
+    </div>
+</div>
+
+<section class="about-story">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-image">
+                <div class="accent-border"></div>
+                <i class="fas fa-scissors image-placeholder"></i>
+            </div>
+            <div class="about-text">
+                <h2>Crafting Fashion That Tells a Story</h2>
+                <p>BloodFord Fashion Brand was born from a simple belief: that fashion should be both bold and meaningful. Founded with a passion for original design, every piece in our collection is crafted in-house — from the initial sketch to the final stitch.</p>
+                <p>We don't follow trends; we create them. Our signature Red, Black & White palette represents the fearless spirit of our customers — people who dare to stand out and express themselves through what they wear.</p>
+                <p>From tailored suits that command boardrooms to casual pieces that redefine street style, BloodFord Fashion Brand serves the modern man and woman who values quality, originality, and self-expression.</p>
+                <p>Every fabric is hand-selected, every design is original, and every customer becomes part of our growing family of fashion-forward individuals across the globe.</p>
+            </div>
+        </div>
+
+        <div class="values-grid">
+            <div class="value-card">
+                <i class="fas fa-pencil-ruler"></i>
+                <h3>Original Design</h3>
+                <p>Every piece is designed exclusively by our creative team. No copies, no imitations — just pure, original fashion.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-gem"></i>
+                <h3>Premium Quality</h3>
+                <p>We source the finest materials from around the world to ensure every garment meets our exacting standards.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-leaf"></i>
+                <h3>Sustainable Fashion</h3>
+                <p>We're committed to ethical manufacturing and sustainable practices in everything we create.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-globe-africa"></i>
+                <h3>African Roots</h3>
+                <p>Proudly African, globally inspired. We blend cultural heritage with contemporary fashion sensibilities.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-users"></i>
+                <h3>Community First</h3>
+                <p>We employ local artisans and give back to our community through various initiatives and programs.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-award"></i>
+                <h3>Award-Winning</h3>
+                <p>Recognized for excellence in fashion design and customer experience across multiple awards.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Brand Statement -->
+<section class="promo-banner">
+    <div class="container" style="flex-direction: column; text-align: center;">
+        <h2 style="font-size: 2rem; margin-bottom: 16px;">
+            "Fashion is the armor to survive the reality of everyday life"
+        </h2>
+        <p style="font-size: 1.1rem; opacity: 0.9;">— The BloodFord Fashion Brand Philosophy</p>
+        <a href="{{ url_for('shop') }}" class="btn btn-outline-white btn-lg" style="margin-top: 24px;">
+            Shop the Collection
+        </a>
+    </div>
+</section>
+{% endblock %}

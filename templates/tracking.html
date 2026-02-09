@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Track Order {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="tracking-header">
+    <div class="container">
+        <h1><i class="fas fa-map-marker-alt" style="color: var(--red);"></i> Track Your Order</h1>
+        <div class="order-num">{{ order.order_number }}</div>
+    </div>
+</div>
+
+<section class="tracking-page">
+    <div class="container">
+        <!-- Delivery Countdown -->
+        {% if order.order_status == 'delivered' %}
+        <div class="delivered-badge">
+            <i class="fas fa-check-circle"></i>
+            <h3>Package Delivered!</h3>
+            <p>Your order was delivered on {{ order.delivered_at.strftime('%B %d, %Y at %I:%M %p') if order.delivered_at else 'recently' }}</p>
+        </div>
+        {% elif remaining %}
+        <div class="delivery-countdown">
+            <h3><i class="fas fa-clock"></i> Estimated Delivery Countdown</h3>
+            <div class="countdown-timer" id="countdownTimer" data-target="{{ order.estimated_delivery.isoformat() }}">
+                <div class="countdown-unit">
+                    <span class="number" id="countDays">--</span>
+                    <span class="label">Days</span>
+                </div>
+                <div class="countdown-unit">
+                    <span class="number" id="countHours">--</span>
+                    <span class="label">Hours</span>
+                </div>
+                <div class="countdown-unit">
+                    <span class="number" id="countMinutes">--</span>
+                    <span class="label">Minutes</span>
+                </div>
+                <div class="countdown-unit">
+                    <span class="number" id="countSeconds">--</span>
+                    <span class="label">Seconds</span>
+                </div>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.85rem; opacity: 0.8;">
+                Expected by {{ order.estimated_delivery.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="tracking-layout">
+            <div>
+                <!-- Progress Steps -->
+                <div class="tracking-progress">
+                    <h2><i class="fas fa-route" style="color: var(--red);"></i> Delivery Progress</h2>
+                    {% set statuses = ['processing', 'confirmed', 'shipped', 'in_transit', 'out_for_delivery', 'delivered'] %}
+                    {% set status_labels = {'processing': 'Processing', 'confirmed': 'Confirmed', 'shipped': 'Shipped', 'in_transit': 'In Transit', 'out_for_delivery': 'Out for Delivery', 'delivered': 'Delivered'} %}
+                    {% set status_icons = {'processing': 'fa-box', 'confirmed': 'fa-check', 'shipped': 'fa-shipping-fast', 'in_transit': 'fa-truck', 'out_for_delivery': 'fa-bicycle', 'delivered': 'fa-home'} %}
+                    {% set current_idx = statuses.index(order.order_status) if order.order_status in statuses else 0 %}
+                    {% set progress_pct = (current_idx / (statuses|length - 1) * 100)|int %}
+
+                    <div class="progress-steps">
+                        <div class="progress-fill" style="width: {{ progress_pct }}%;"></div>
+                        {% for status in statuses %}
+                        {% set idx = loop.index0 %}
+                        <div class="progress-step {% if idx < current_idx %}completed{% elif idx == current_idx %}active{% endif %}">
+                            <div class="step-icon">
+                                {% if idx < current_idx %}
+                                <i class="fas fa-check"></i>
+                                {% else %}
+                                <i class="fas {{ status_icons[status] }}"></i>
+                                {% endif %}
+                            </div>
+                            <div class="step-label">{{ status_labels[status] }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="tracking-timeline">
+                    <h2><i class="fas fa-history" style="color: var(--red);"></i> Tracking Updates</h2>
+                    <div class="timeline">
+                        {% for update in tracking_updates %}
+                        <div class="timeline-item {% if loop.first %}active{% elif loop.index <= tracking_updates|length %}completed{% endif %}">
+                            <div class="time">{{ update.timestamp.strftime('%b %d, %Y — %I:%M %p') }}</div>
+                            <div class="status">{{ update.status|replace('_', ' ')|title }}</div>
+                            <div class="description">{{ update.description }}</div>
+                            {% if update.location %}
+                            <div class="location"><i class="fas fa-map-pin"></i> {{ update.location }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if order.order_status != 'delivered' %}
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="{{ url_for('track_order', order_number=order.order_number) }}" class="btn btn-outline">
+                        <i class="fas fa-sync-alt"></i> Refresh Tracking
+                    </a>
+                    <p style="color: var(--gray-500); font-size: 0.8rem; margin-top: 8px;">
+                        Tip: Refresh every few seconds to see the order progress through each stage (simulated).
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="tracking-sidebar">
+                <div class="tracking-info-card">
+                    <h3>Order Details</h3>
+                    <div class="info-row">
+                        <span class="label">Order Number</span>
+                        <span class="value">{{ order.order_number }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Order Date</span>
+                        <span class="value">{{ order.created_at.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Total Amount</span>
+                        <span class="value" style="color: var(--red);">UGX {{ "{:,.0f}".format(order.total_amount) }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Payment</span>
+                        <span class="value">{{ order.payment_method|replace('_', ' ')|title }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status</span>
+                        <span class="value">
+                            <span class="order-status-badge status-{{ order.order_status }}">
+                                {{ order.order_status|replace('_', ' ')|title }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="tracking-info-card">
+                    <h3>Shipping To</h3>
+                    <div class="info-row">
+                        <span class="label">Name</span>
+                        <span class="value">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Address</span>
+                        <span class="value">{{ order.shipping_address }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">City</span>
+                        <span class="value">{{ order.shipping_city }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Country</span>
+                        <span class="value">{{ order.shipping_country }}</span>
+                    </div>
+                </div>
+
+                <div class="tracking-info-card">
+                    <h3>Items Ordered</h3>
+                    {% for item in order.items %}
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-200);">
+                        <div style="width: 45px; height: 55px; background: var(--gray-100); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--gray-400); flex-shrink: 0;">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.85rem; font-weight: 600;">{{ item.product.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--gray-500);">{{ item.size }} / {{ item.color }} &times; {{ item.quantity }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="tracking-info-card">
+                    <h3>Tracking Number</h3>
+                    <div style="background: var(--gray-100); padding: 12px; border-radius: var(--radius-sm); text-align: center; font-family: var(--font-accent); font-size: 1.1rem; letter-spacing: 2px; color: var(--red);">
+                        {{ order.tracking_number }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

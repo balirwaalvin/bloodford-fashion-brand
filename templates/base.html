@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BloodFord Fashion Brand{% endblock %} | Luxury Fashion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- ═══ ANNOUNCEMENT BAR ═══ -->
+    <div class="announcement-bar">
+        <div class="container">
+            <span><i class="fas fa-truck"></i> Free Shipping on Orders Over UGX 200,000</span>
+            <span class="divider">|</span>
+            <span><i class="fas fa-undo"></i> 30-Day Returns</span>
+            <span class="divider">|</span>
+            <span><i class="fas fa-gem"></i> Original Designs by BloodFord Fashion Brand</span>
+        </div>
+    </div>
+
+    <!-- ═══ NAVIGATION ═══ -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('home') }}" class="logo">
+                <img src="{{ url_for('static', filename='images/bloodford-logo.png') }}" alt="BloodFord Fashion Brand" class="logo-img">
+                <div class="logo-text">
+                    <span class="logo-name">BLOODFORD</span>
+                    <span class="logo-sub">FASHION BRAND</span>
+                </div>
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+                <li class="dropdown">
+                    <a href="{{ url_for('shop') }}" class="{% if request.endpoint == 'shop' %}active{% endif %}">
+                        Shop <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu mega-menu">
+                        <div class="mega-column">
+                            <h4>Men</h4>
+                            <a href="{{ url_for('shop', category='men', subcategory='suits') }}">Suits</a>
+                            <a href="{{ url_for('shop', category='men', subcategory='blazers') }}">Blazers</a>
+                            <a href="{{ url_for('shop', category='men', subcategory='shirts') }}">Shirts</a>
+                            <a href="{{ url_for('shop', category='men', subcategory='trousers') }}">Trousers</a>
+                            <a href="{{ url_for('shop', category='men', subcategory='jackets') }}">Jackets</a>
+                            <a href="{{ url_for('shop', category='men', subcategory='shoes') }}">Shoes</a>
+                        </div>
+                        <div class="mega-column">
+                            <h4>Women</h4>
+                            <a href="{{ url_for('shop', category='women', subcategory='dresses') }}">Dresses</a>
+                            <a href="{{ url_for('shop', category='women', subcategory='suits') }}">Suits</a>
+                            <a href="{{ url_for('shop', category='women', subcategory='tops') }}">Tops & Blouses</a>
+                            <a href="{{ url_for('shop', category='women', subcategory='skirts') }}">Skirts</a>
+                            <a href="{{ url_for('shop', category='women', subcategory='jackets') }}">Jackets</a>
+                            <a href="{{ url_for('shop', category='women', subcategory='shoes') }}">Shoes</a>
+                        </div>
+                        <div class="mega-column">
+                            <h4>Collections</h4>
+                            <a href="{{ url_for('shop', sort='popular') }}">Best Sellers</a>
+                            <a href="{{ url_for('shop', category='unisex') }}">Unisex</a>
+                            <a href="{{ url_for('shop') }}">New Arrivals</a>
+                            <a href="{{ url_for('shop') }}">Accessories</a>
+                        </div>
+                    </div>
+                </li>
+                <li><a href="{{ url_for('shop', category='men') }}">Men</a></li>
+                <li><a href="{{ url_for('shop', category='women') }}">Women</a></li>
+                <li><a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
+                <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="nav-search-btn" id="searchToggle" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+
+                {% if current_user.is_authenticated %}
+                <div class="user-dropdown">
+                    <button class="nav-icon-btn" aria-label="Account">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="user-dropdown-menu">
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ current_user.first_name }} {{ current_user.last_name }}</span>
+                        </div>
+                        <a href="{{ url_for('profile') }}"><i class="fas fa-id-card"></i> My Profile</a>
+                        <a href="{{ url_for('orders') }}"><i class="fas fa-box"></i> My Orders</a>
+                        <a href="{{ url_for('wishlist') }}"><i class="fas fa-heart"></i> Wishlist</a>
+                        <hr>
+                        <a href="{{ url_for('logout') }}" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('wishlist') }}" class="nav-icon-btn" aria-label="Wishlist">
+                    <i class="fas fa-heart"></i>
+                </a>
+
+                <a href="{{ url_for('cart') }}" class="nav-icon-btn cart-btn" aria-label="Cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    {% if cart_count > 0 %}
+                    <span class="cart-badge" id="cartBadge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="nav-icon-btn" aria-label="Login">
+                    <i class="fas fa-user"></i>
+                </a>
+                {% endif %}
+
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Overlay -->
+        <div class="search-overlay" id="searchOverlay">
+            <div class="container">
+                <form action="{{ url_for('shop') }}" method="GET" class="search-form">
+                    <input type="text" name="search" placeholder="Search for products..." autofocus>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                    <button type="button" class="search-close" id="searchClose"><i class="fas fa-times"></i></button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ FLASH MESSAGES ═══ -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container" id="flashContainer">
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+            <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-exclamation-circle{% elif category == 'info' %}fa-info-circle{% else %}fa-bell{% endif %}"></i>
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-col footer-brand">
+                        <div class="footer-logo">
+                            <img src="{{ url_for('static', filename='images/bloodford-logo.png') }}" alt="BloodFord Fashion Brand" class="logo-img footer-logo-img">
+                            <div class="logo-text">
+                                <span class="logo-name">BLOODFORD</span>
+                                <span class="logo-sub">FASHION BRAND</span>
+                            </div>
+                        </div>
+                        <p>Original designs crafted with passion. Redefining fashion for the modern individual with bold, elegant, and timeless pieces.</p>
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                            <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                        </div>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Quick Links</h4>
+                        <a href="{{ url_for('shop', category='men') }}">Men's Collection</a>
+                        <a href="{{ url_for('shop', category='women') }}">Women's Collection</a>
+                        <a href="{{ url_for('shop', category='unisex') }}">Unisex</a>
+                        <a href="{{ url_for('shop', sort='popular') }}">Best Sellers</a>
+                        <a href="{{ url_for('about') }}">Our Story</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Customer Service</h4>
+                        <a href="{{ url_for('contact') }}">Contact Us</a>
+                        <a href="#">Shipping & Returns</a>
+                        <a href="#">Size Guide</a>
+                        <a href="#">FAQs</a>
+                        <a href="#">Privacy Policy</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Newsletter</h4>
+                        <p>Subscribe for exclusive offers and new arrivals.</p>
+                        <form class="newsletter-form" id="newsletterForm">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                        <div class="payment-icons">
+                            <span title="Visa"><i class="fab fa-cc-visa"></i></span>
+                            <span title="Mastercard"><i class="fab fa-cc-mastercard"></i></span>
+                            <span title="Mobile Money"><i class="fas fa-mobile-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2026 BloodFord Fashion Brand. All rights reserved. | Original Designs.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

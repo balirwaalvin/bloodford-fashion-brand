@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Shop{% endblock %}
+
+{% block content %}
+<div class="shop-header">
+    <div class="container">
+        <h1>
+            {% if category != 'all' %}{{ category|capitalize }}'s Collection{% else %}All Products{% endif %}
+            {% if subcategory != 'all' %} — {{ subcategory|capitalize }}{% endif %}
+        </h1>
+        <p>Original designs by BloodFord Fashion Brand</p>
+        <div class="breadcrumb">
+            <a href="{{ url_for('home') }}">Home</a>
+            <span>/</span>
+            <a href="{{ url_for('shop') }}">Shop</a>
+            {% if category != 'all' %}
+            <span>/</span>
+            <span class="current">{{ category|capitalize }}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        <!-- Filter Tags -->
+        {% if category != 'all' or search or subcategory != 'all' %}
+        <div class="filter-tags">
+            {% if category != 'all' %}
+            <span class="filter-tag">
+                {{ category|capitalize }}
+                <a href="javascript:void(0)" class="remove" onclick="removeFilter('category')"><i class="fas fa-times"></i></a>
+            </span>
+            {% endif %}
+            {% if subcategory != 'all' %}
+            <span class="filter-tag">
+                {{ subcategory|capitalize }}
+                <a href="javascript:void(0)" class="remove" onclick="removeFilter('subcategory')"><i class="fas fa-times"></i></a>
+            </span>
+            {% endif %}
+            {% if search %}
+            <span class="filter-tag">
+                Search: "{{ search }}"
+                <a href="javascript:void(0)" class="remove" onclick="removeFilter('search')"><i class="fas fa-times"></i></a>
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Controls -->
+        <div class="shop-controls">
+            <span class="results-count">Showing {{ products.items|length }} of {{ products.total }} products</span>
+            <div class="controls-right">
+                <select onchange="applySorting(this.value)">
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                    <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                </select>
+                <select onchange="applyFilter('category', this.value)">
+                    <option value="all" {% if category == 'all' %}selected{% endif %}>All Categories</option>
+                    <option value="men" {% if category == 'men' %}selected{% endif %}>Men</option>
+                    <option value="women" {% if category == 'women' %}selected{% endif %}>Women</option>
+                    <option value="unisex" {% if category == 'unisex' %}selected{% endif %}>Unisex</option>
+                </select>
+            </div>
+        </div>
+
+        {% if products.items %}
+        <div class="products-grid">
+            {% for product in products.items %}
+            <div class="product-card">
+                <div class="product-card-image">
+                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <div class="product-card-badges">
+                        {% if product.new_arrival %}
+                        <span class="badge badge-new">New</span>
+                        {% endif %}
+                        {% if product.original_price and product.original_price > product.price %}
+                        <span class="badge badge-sale">Sale</span>
+                        {% endif %}
+                        {% if product.best_seller %}
+                        <span class="badge badge-best">Best Seller</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-actions">
+                        <button class="product-action-btn" onclick="toggleWishlist({{ product.id }}, this)" title="Wishlist">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-action-btn" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                    <div class="product-quick-add">
+                        <button class="btn btn-primary btn-block btn-sm" onclick="addToCart({{ product.id }}, 'M', 'Black')">
+                            <i class="fas fa-shopping-bag"></i> Quick Add
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card-info">
+                    <div class="product-card-category">{{ product.category }} — {{ product.subcategory }}</div>
+                    <h3 class="product-card-name">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-card-rating">
+                        <span class="stars">
+                            {% for i in range(5) %}
+                            <i class="fas fa-star"></i>
+                            {% endfor %}
+                        </span>
+                        <span class="count">({{ product.num_reviews }})</span>
+                    </div>
+                    <div class="product-card-price">
+                        <span class="price-current">UGX {{ "{:,.0f}".format(product.price) }}</span>
+                        {% if product.original_price and product.original_price > product.price %}
+                        <span class="price-original">UGX {{ "{:,.0f}".format(product.original_price) }}</span>
+                        {% set discount = ((product.original_price - product.price) / product.original_price * 100)|int %}
+                        <span class="price-discount">-{{ discount }}%</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.pages > 1 %}
+        <div class="pagination">
+            {% if products.has_prev %}
+            <a href="{{ url_for('shop', page=products.prev_num, category=category, subcategory=subcategory, sort=sort, search=search) }}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            {% endif %}
+
+            {% for page_num in products.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if page_num == products.page %}
+                    <span class="active">{{ page_num }}</span>
+                    {% else %}
+                    <a href="{{ url_for('shop', page=page_num, category=category, subcategory=subcategory, sort=sort, search=search) }}">
+                        {{ page_num }}
+                    </a>
+                    {% endif %}
+                {% else %}
+                <span>...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+            <a href="{{ url_for('shop', page=products.next_num, category=category, subcategory=subcategory, sort=sort, search=search) }}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-search"></i>
+            <h2>No products found</h2>
+            <p>Try adjusting your search or filter to find what you're looking for.</p>
+            <a href="{{ url_for('shop') }}" class="btn btn-primary">View All Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

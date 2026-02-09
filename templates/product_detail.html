@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="container">
+        <div class="breadcrumb" style="justify-content: flex-start; margin-bottom: 30px;">
+            <a href="{{ url_for('home') }}">Home</a>
+            <span>/</span>
+            <a href="{{ url_for('shop') }}">Shop</a>
+            <span>/</span>
+            <a href="{{ url_for('shop', category=product.category) }}">{{ product.category|capitalize }}</a>
+            <span>/</span>
+            <span class="current" style="color: var(--black);">{{ product.name }}</span>
+        </div>
+
+        <div class="product-detail-grid">
+            <!-- Gallery -->
+            <div class="product-gallery">
+                <div class="product-main-image">
+                    <i class="fas fa-tshirt product-placeholder"></i>
+                </div>
+                <div class="product-thumbnails">
+                    <div class="thumb active"><i class="fas fa-tshirt"></i></div>
+                    <div class="thumb"><i class="fas fa-tshirt"></i></div>
+                    <div class="thumb"><i class="fas fa-tshirt"></i></div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info-section">
+                <div class="product-category">{{ product.category }} / {{ product.subcategory }}</div>
+                <h1>{{ product.name }}</h1>
+
+                <div class="product-rating-row">
+                    <span class="stars">
+                        {% for i in range(5) %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </span>
+                    <span class="rating-text">{{ product.rating }} ({{ product.num_reviews }} reviews)</span>
+                </div>
+
+                <div class="product-price-row">
+                    <span class="current-price">UGX {{ "{:,.0f}".format(product.price) }}</span>
+                    {% if product.original_price and product.original_price > product.price %}
+                    <span class="original-price">UGX {{ "{:,.0f}".format(product.original_price) }}</span>
+                    {% set savings = product.original_price - product.price %}
+                    <span class="save-badge">Save UGX {{ "{:,.0f}".format(savings) }}</span>
+                    {% endif %}
+                </div>
+
+                <p class="product-description">{{ product.description }}</p>
+
+                <div class="product-options">
+                    <!-- Size -->
+                    <div class="option-group">
+                        <label>Size</label>
+                        <div class="size-options">
+                            {% for size in product.sizes.split(',') %}
+                            <button class="size-btn {% if loop.index == 2 %}active{% endif %}" onclick="selectSize(this)">
+                                {{ size.strip() }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Color -->
+                    <div class="option-group">
+                        <label>Color</label>
+                        <div class="color-options">
+                            {% for color in product.colors.split(',') %}
+                            <button class="color-btn {% if loop.first %}active{% endif %}"
+                                style="background: {{ color.strip().lower() }}{% if color.strip().lower() == 'white' %}; border: 1px solid #ddd{% endif %};"
+                                onclick="selectColor(this)"
+                                title="{{ color.strip() }}">
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="option-group">
+                        <label>Quantity</label>
+                        <div class="quantity-selector">
+                            <button onclick="changeQuantity(-1)">−</button>
+                            <input type="number" id="quantityInput" value="1" min="1" max="99" readonly>
+                            <button onclick="changeQuantity(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-actions">
+                    <button class="btn btn-primary btn-lg" onclick="
+                        const size = document.querySelector('.size-btn.active')?.textContent.trim() || 'M';
+                        const color = document.querySelector('.color-btn.active')?.title || 'Black';
+                        const qty = parseInt(document.getElementById('quantityInput').value);
+                        addToCart({{ product.id }}, size, color, qty);
+                    ">
+                        <i class="fas fa-shopping-bag"></i> Add to Cart
+                    </button>
+                    <button class="btn btn-outline wishlist-btn" onclick="toggleWishlist({{ product.id }}, this)">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="product-meta">
+                    <p><strong>SKU:</strong> BF-{{ product.id }}-{{ product.subcategory[:3]|upper }}</p>
+                    <p><strong>Category:</strong> {{ product.category|capitalize }} / {{ product.subcategory|capitalize }}</p>
+                    <p><strong>Availability:</strong> {% if product.stock > 0 %}<span style="color: #4CAF50;">In Stock ({{ product.stock }} left)</span>{% else %}<span style="color: var(--red);">Out of Stock</span>{% endif %}</p>
+                    <p><strong>Tags:</strong> Original Design, {{ product.category|capitalize }}, {{ product.subcategory|capitalize }}, BloodFord Fashion Brand</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ REVIEWS SECTION ═══ -->
+<section class="section section-gray">
+    <div class="container">
+        <div class="section-header">
+            <h2>Customer Reviews</h2>
+        </div>
+
+        {% if current_user.is_authenticated %}
+        <div style="max-width: 600px; margin: 0 auto 40px; background: white; padding: 30px; border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+            <h3 style="font-family: var(--font-display); margin-bottom: 16px;">Write a Review</h3>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Rating</label>
+                <div style="display: flex; gap: 8px; font-size: 1.5rem; cursor: pointer;">
+                    {% for i in range(1, 6) %}
+                    <i class="fas fa-star review-star {% if i <= 5 %}active{% endif %}" onclick="setRating({{ i }})" style="color: {% if i <= 5 %}var(--gold){% else %}var(--gray-300){% endif %};"></i>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Your Review</label>
+                <textarea id="reviewComment" class="form-control" rows="3" placeholder="Share your thoughts about this product..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="submitReview({{ product.id }})">Submit Review</button>
+        </div>
+        {% endif %}
+
+        {% if reviews %}
+        <div style="max-width: 600px; margin: 0 auto;">
+            {% for review in reviews %}
+            <div style="background: white; padding: 20px; border-radius: var(--radius-md); margin-bottom: 16px; border: 1px solid var(--gray-200);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong>{{ review.user.first_name }} {{ review.user.last_name[0] }}.</strong>
+                    <span style="color: var(--gold); font-size: 0.9rem;">
+                        {% for i in range(review.rating) %}<i class="fas fa-star"></i>{% endfor %}
+                    </span>
+                </div>
+                <p style="color: var(--gray-700); font-size: 0.9rem;">{{ review.comment }}</p>
+                <small style="color: var(--gray-500);">{{ review.created_at.strftime('%B %d, %Y') }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--gray-500);">No reviews yet. Be the first to review this product!</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ═══ RELATED PRODUCTS ═══ -->
+{% if related %}
+<section class="related-products">
+    <div class="container">
+        <div class="section-header">
+            <span class="label">You May Also Like</span>
+            <h2>Related Products</h2>
+        </div>
+        <div class="products-grid">
+            {% for product in related %}
+            <div class="product-card">
+                <div class="product-card-image">
+                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <div class="product-card-actions">
+                        <button class="product-action-btn" onclick="toggleWishlist({{ product.id }}, this)">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-action-btn">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                    <div class="product-quick-add">
+                        <button class="btn btn-primary btn-block btn-sm" onclick="addToCart({{ product.id }}, 'M', 'Black')">
+                            <i class="fas fa-shopping-bag"></i> Quick Add
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card-info">
+                    <div class="product-card-category">{{ product.category }} — {{ product.subcategory }}</div>
+                    <h3 class="product-card-name">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-card-price">
+                        <span class="price-current">UGX {{ "{:,.0f}".format(product.price) }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

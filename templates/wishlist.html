@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}My Wishlist{% endblock %}
+
+{% block content %}
+<section class="wishlist-page">
+    <div class="container">
+        <h1><i class="fas fa-heart" style="color: var(--red);"></i> My Wishlist</h1>
+
+        {% if items %}
+        <div class="products-grid">
+            {% for item in items %}
+            <div class="product-card">
+                <div class="product-card-image">
+                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <div class="product-card-actions" style="opacity: 1; transform: translateX(0);">
+                        <button class="product-action-btn wishlisted" onclick="toggleWishlist({{ item.product.id }}, this); setTimeout(() => location.reload(), 500);">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-quick-add">
+                        <button class="btn btn-primary btn-block btn-sm" onclick="addToCart({{ item.product.id }}, 'M', 'Black')">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+                <div class="product-card-info">
+                    <div class="product-card-category">{{ item.product.category }} — {{ item.product.subcategory }}</div>
+                    <h3 class="product-card-name">
+                        <a href="{{ url_for('product_detail', product_id=item.product.id) }}">{{ item.product.name }}</a>
+                    </h3>
+                    <div class="product-card-price">
+                        <span class="price-current">UGX {{ "{:,.0f}".format(item.product.price) }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-heart"></i>
+            <h2>Your wishlist is empty</h2>
+            <p>Save items you love to your wishlist. Review them anytime and easily move them to your cart.</p>
+            <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg">Explore Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

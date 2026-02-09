@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<section class="orders-page">
+    <div class="container">
+        <h1><i class="fas fa-box" style="color: var(--red);"></i> My Orders</h1>
+
+        {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-card-header">
+                <div>
+                    <span class="order-num">{{ order.order_number }}</span>
+                    <span class="order-date">&bull; {{ order.created_at.strftime('%B %d, %Y') }}</span>
+                </div>
+                <span class="order-status-badge status-{{ order.order_status }}">
+                    {{ order.order_status|replace('_', ' ')|title }}
+                </span>
+            </div>
+            <div class="order-card-body">
+                <div class="order-items-preview">
+                    {% for item in order.items[:4] %}
+                    <div class="order-item-thumb">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    {% endfor %}
+                    {% if order.items|length > 4 %}
+                    <div class="order-item-thumb" style="font-size: 0.75rem; font-weight: 700;">
+                        +{{ order.items|length - 4 }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="order-card-footer">
+                    <div class="order-total">UGX {{ "{:,.0f}".format(order.total_amount) }}</div>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="{{ url_for('track_order', order_number=order.order_number) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-map-marker-alt"></i> Track
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-box-open"></i>
+            <h2>No orders yet</h2>
+            <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+            <a href="{{ url_for('shop') }}" class="btn btn-primary btn-lg">Start Shopping</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
