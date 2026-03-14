@@ -72,7 +72,7 @@
             {% for product in products.items %}
             <div class="product-card">
                 <div class="product-card-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}">
                     <div class="product-card-badges">
                         {% if product.new_arrival %}
                         <span class="badge badge-new">New</span>

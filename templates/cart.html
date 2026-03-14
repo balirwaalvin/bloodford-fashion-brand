@@ -12,7 +12,7 @@
                 {% for item in items %}
                 <div class="cart-item" id="cartItem-{{ item.id }}">
                     <a href="{{ url_for('product_detail', product_id=item.product.id) }}" class="cart-item-image">
-                        <i class="fas fa-tshirt"></i>
+                        <img src="{{ url_for('static', filename='images/' ~ item.product.image) }}" alt="{{ item.product.name }}">
                     </a>
                     <div class="cart-item-details">
                         <h3><a href="{{ url_for('product_detail', product_id=item.product.id) }}">{{ item.product.name }}</a></h3>

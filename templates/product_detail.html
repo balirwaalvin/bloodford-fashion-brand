@@ -18,12 +18,12 @@
             <!-- Gallery -->
             <div class="product-gallery">
                 <div class="product-main-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}" id="mainImage">
                 </div>
                 <div class="product-thumbnails">
-                    <div class="thumb active"><i class="fas fa-tshirt"></i></div>
-                    <div class="thumb"><i class="fas fa-tshirt"></i></div>
-                    <div class="thumb"><i class="fas fa-tshirt"></i></div>
+                    <div class="thumb active"><img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="Thumb"></div>
+                    <div class="thumb"><img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="Thumb"></div>
+                    <div class="thumb"><img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="Thumb"></div>
                 </div>
             </div>
 
@@ -174,7 +174,7 @@
             {% for product in related %}
             <div class="product-card">
                 <div class="product-card-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}">
                     <div class="product-card-actions">
                         <button class="product-action-btn" onclick="toggleWishlist({{ product.id }}, this)">
                             <i class="far fa-heart"></i>

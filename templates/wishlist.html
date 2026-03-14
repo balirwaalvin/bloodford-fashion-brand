@@ -11,7 +11,7 @@
             {% for item in items %}
             <div class="product-card">
                 <div class="product-card-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ item.product.image) }}" alt="{{ item.product.name }}">
                     <div class="product-card-actions" style="opacity: 1; transform: translateX(0);">
                         <button class="product-action-btn wishlisted" onclick="toggleWishlist({{ item.product.id }}, this); setTimeout(() => location.reload(), 500);">
                             <i class="fas fa-heart"></i>

@@ -114,7 +114,7 @@
             {% for product in featured %}
             <div class="product-card">
                 <div class="product-card-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}">
                     <div class="product-card-badges">
                         {% if product.new_arrival %}
                         <span class="badge badge-new">New</span>
@@ -195,7 +195,7 @@
             {% for product in new_arrivals %}
             <div class="product-card">
                 <div class="product-card-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}">
                     <div class="product-card-badges">
                         <span class="badge badge-new">New</span>
                     </div>
@@ -245,7 +245,7 @@
             {% for product in best_sellers %}
             <div class="product-card">
                 <div class="product-card-image">
-                    <i class="fas fa-tshirt product-placeholder"></i>
+                    <img src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}">
                     <div class="product-card-badges">
                         <span class="badge badge-best">Best Seller</span>
                     </div>
