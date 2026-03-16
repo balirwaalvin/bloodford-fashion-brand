@@ -13,7 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # ── App Configuration ────────────────────────────────────────────────
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets.token_hex(32)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bloodford_fashion.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -770,14 +770,19 @@ def seed_products():
     print("✅ Database seeded with products!")
 
 
+def initialize_database():
+    with app.app_context():
+        db.create_all()
+        seed_products()
+
+
+initialize_database()
+
+
 # ══════════════════════════════════════════════════════════════════════
 # RUN APP
 # ══════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    import os
-    with app.app_context():
-        db.create_all()
-        seed_products()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
